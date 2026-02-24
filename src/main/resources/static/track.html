@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Tracking - SheWalk</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <style>
+        :root {
+            --header-blue: #2c3e50;
+            --bg-gray: #f4f7f6;
+            --accent-red: #e74c3c;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-gray);
+        }
+
+        .header {
+            text-align: center;
+            padding: 15px;
+            background: var(--header-blue);
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        #map {
+            height: calc(100vh - 60px);
+            width: 100%;
+            z-index: 1;
+        }
+
+        /* Thematic Info Box */
+        #locationBox {
+            position: absolute;
+            top: 80px;
+            left: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            max-width: 250px;
+            border-top: 4px solid var(--accent-red);
+            display: none;
+        }
+
+        #locationBox h4 { margin: 0 0 10px 0; color: var(--header-blue); font-size: 14px; }
+        #locationBox p { margin: 5px 0; font-size: 12px; color: #555; }
+        .status-badge { font-weight: 600; color: var(--accent-red); animation: blink 1.5s infinite; }
+
+        @keyframes blink { 50% { opacity: 0.5; } }
+
+        /* Thematic Direction Button with Hover Effect */
+        .direction-btn {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            background-color: var(--header-blue);
+            color: white;
+            padding: 14px 22px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .direction-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            background-color: #1a252f;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        #statusMsg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2000;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="header">SheWalk Live Location Tracking</div>
+
+<div id="locationBox">
+    <h4 id="status">Live tracking active</h4>
+    <p><strong>Lat:</strong> <span id="lat">0.0</span></p>
+    <p><strong>Lon:</strong> <span id="lon">0.0</span></p>
+    <p><strong>Last Updated:</strong> <br><span id="time">--:--</span></p>
+</div>
+
+<div id="statusMsg"></div>
+<div id="map"></div>
+
+<button class="direction-btn" id="directionBtn" style="display:none;">
+    Open in Google Maps
+</button>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="js/track.js"></script>
+
+</body>
+</html>
+
+

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - SheWalk</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-red: #e74c3c;
+            --dark-blue: #2c3e50;
+            --bg-gray: #f4f7f6;
+            --safe-green: #27ae60;
+        }
+
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg-gray); margin: 0; padding: 0; overflow-x: hidden; }
+
+        .header {
+            background-color: var(--dark-blue); color: white;
+            padding: 0.6rem 1.2rem; display: flex;
+            justify-content: space-between; align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .container { max-width: 500px; margin: 15px auto; padding: 0 15px; }
+        .welcome-section { text-align: center; margin-bottom: 15px; }
+        .welcome-section h2 { margin: 5px 0; font-size: 1.3rem; color: var(--dark-blue); }
+
+        /* --- THE HOVER "COMING FORWARD" EFFECT --- */
+        .btn-hover-effect {
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+        }
+        .btn-hover-effect:hover {
+            transform: translateY(-4px) scale(1.03);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+        }
+        .btn-hover-effect:active { transform: translateY(-1px); }
+
+        .emergency-card, .profile-card {
+            background: white; border-radius: 12px; padding: 20px;
+            text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            margin-bottom: 15px;
+        }
+
+        #startEmergencyBtn {
+            background-color: var(--primary-red); color: white;
+            font-size: 16px; font-weight: 600; padding: 14px 30px;
+            border: none; border-radius: 50px;
+        }
+
+        #stopEmergencyBtn {
+            background-color: #bdc3c7; color: #2c3e50;
+            padding: 10px 20px; border: none; border-radius: 6px;
+            font-weight: 600; margin-top: 10px;
+        }
+
+        .pulse-active { animation: pulse-red 2s infinite; border: 2px solid var(--primary-red); }
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(231, 76, 60, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+        }
+
+        #adminBtn { display: none; background: white; color: var(--dark-blue); border: none; padding: 5px 12px; border-radius: 4px; font-weight: 600; margin-right: 8px; font-size: 0.8rem; }
+
+        /* MODALS */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(44, 62, 80, 0.8);
+            display: none; justify-content: center; align-items: center;
+            z-index: 1000; backdrop-filter: blur(3px);
+        }
+        .modal-content { background: white; padding: 25px; border-radius: 12px; width: 280px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .modal-btns { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
+        .btn-confirm { background: var(--primary-red); color: white; border: none; padding: 8px 18px; border-radius: 5px; font-weight: 600; }
+        .btn-gray { background: #95a5a6; color: white; border: none; padding: 8px 18px; border-radius: 5px; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h4 style="margin:0; font-size: 1rem;">SheWalk</h4>
+    <div>
+        <button id="adminBtn" class="btn-hover-effect">Admin Panel</button>
+        <button id="logoutBtn" class="btn-hover-effect" style="background:transparent; border:1px solid rgba(255,255,255,0.5); color:white; padding:5px 12px; border-radius:4px; font-size: 0.8rem;">Logout</button>
+    </div>
+</div>
+
+<div class="container">
+    <div class="welcome-section">
+        <h2 id="welcome">Loading...</h2>
+    </div>
+
+    <div class="emergency-card" id="sosCard">
+        <div id="safeMode">
+            <button id="startEmergencyBtn" class="btn-hover-effect">🚨 START EMERGENCY (SOS)</button>
+        </div>
+        <div id="emergencyMode" style="display: none;">
+            <h4 style="color: var(--primary-red); margin: 0 0 10px 0;">⚠️ SOS ACTIVE</h4>
+            <button id="stopEmergencyBtn" class="btn-hover-effect">I am safe now</button>
+        </div>
+        <p id="emergencyMessage" style="font-size: 0.75rem; margin-top: 10px; color: #777;"></p>
+    </div>
+
+    <div class="profile-card">
+        <h4 style="margin-top:0;">User Profile</h4>
+        <p><strong>Name:</strong> <span id="profileName"></span></p>
+        <p><strong>Email:</strong> <span id="profileEmail"></span></p>
+    </div>
+</div>
+
+<div id="logoutModal" class="modal-overlay">
+    <div class="modal-content">
+        <h4 style="margin:0;">Logout?</h4>
+        <p style="font-size: 0.85rem; color: #555; margin-top: 10px;">Are you sure you want to end your session?</p>
+        <div class="modal-btns">
+            <button class="btn-gray btn-hover-effect" onclick="closeLogoutModal()">Cancel</button>
+            <button class="btn-confirm btn-hover-effect" onclick="confirmLogout()">Logout</button>
+        </div>
+    </div>
+</div>
+
+<div id="alertModal" class="modal-overlay">
+    <div class="modal-content">
+        <h4 id="alertTitle">Notice</h4>
+        <p id="alertMessage" style="font-size: 0.85rem; color: #555;"></p>
+        <div class="modal-btns">
+            <button class="btn-confirm btn-hover-effect" onclick="closeAlert()">OK</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/home.js"></script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - SheWalk</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --header-blue: #2c3e50; --bg-gray: #f4f7f6; --accent-red: #e74c3c; --safe-green: #27ae60; }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg-gray); height: 100vh; display: flex; justify-content: center; align-items: center; margin: 0; }
+        .container { background: white; padding: 30px 40px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); width: 100%; max-width: 420px; text-align: center; border-top: 5px solid var(--header-blue); }
+        h2 { color: var(--header-blue); margin-bottom: 20px; }
+        .input-group { text-align: left; margin-bottom: 10px; }
+        input, select { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #e1e4e8; border-radius: 6px; box-sizing: border-box; font-family: 'Poppins'; }
+        input.input-error { border-color: var(--accent-red); background-color: #fff8f8; }
+        .error-text { color: var(--accent-red); font-size: 11px; min-height: 15px; display: block; }
+        button { width: 100%; padding: 14px; background-color: var(--header-blue); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; margin-top: 10px; transition: opacity 0.3s; }
+        button:hover { opacity: 0.9; }
+        .footer-link { margin-top: 20px; font-size: 14px; color: #666; }
+        .footer-link a { color: #3498db; text-decoration: none; font-weight: 600; }
+
+        /* Modal Styles */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(2px); }
+        .modal-content { background: white; padding: 25px; border-radius: 12px; width: 300px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        #modalTitle { margin-top: 0; font-size: 1.2rem; }
+        .btn-modal { background: var(--header-blue); color: white; border: none; padding: 10px 25px; border-radius: 5px; cursor: pointer; margin-top: 15px; font-weight: 600; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Create Account</h2>
+    <form id="registerForm" novalidate>
+        <div class="input-group"><input type="text" id="name" placeholder="Full Name"><span class="error-text" id="nameError"></span></div>
+        <div class="input-group"><input type="email" id="email" placeholder="Email Address"><span class="error-text" id="emailError"></span></div>
+        <div class="input-group"><input type="password" id="password" placeholder="Password"><span class="error-text" id="passwordError"></span></div>
+        <div class="input-group"><input type="password" id="confirmPassword" placeholder="Confirm Password"><span class="error-text" id="confirmPasswordError"></span></div>
+        <div class="input-group"><input type="email" id="trustedEmail" placeholder="Trusted Contact Email"><span class="error-text" id="trustedEmailError"></span></div>
+        <div class="input-group">
+            <select id="role">
+                <option value="" disabled selected>Select Role</option>
+                <option value="ROLE_USER">User</option>
+                <option value="ROLE_ADMIN">Admin</option>
+            </select>
+            <span class="error-text" id="roleError"></span>
+        </div>
+        <button type="submit" id="regBtn">Sign Up</button>
+    </form>
+    <div class="footer-link">Already have an account? <a href="login.html">Log In</a></div>
+</div>
+
+<div id="validationModal" class="modal-overlay">
+    <div class="modal-content">
+        <h4 id="modalTitle">Notice</h4>
+        <p id="validationMsg"></p>
+        <button id="modalBtn" onclick="closeValidation()" class="btn-modal">OK</button>
+    </div>
+</div>
+
+<script src="js/register.js"></script>
+</body>
+</html>
+

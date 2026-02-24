@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SheWalk Admin Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        :root {
+            --primary-red: #e74c3c;
+            --dark-blue: #2c3e50;
+            --light-gray: #f4f7f6;
+            --overlay: rgba(44, 62, 80, 0.8);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-gray);
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            background-color: var(--dark-blue);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        h3 {
+            margin-top: 0;
+            color: var(--dark-blue);
+            border-bottom: 2px solid var(--light-gray);
+            padding-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            color: #333;
+            font-weight: 600;
+            text-align: left;
+            padding: 12px;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            color: #555;
+        }
+
+        tr:hover {
+            background-color: #fcfcfc;
+        }
+
+        .btn-stop {
+            background-color: var(--primary-red);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-stop:hover {
+            background-color: #c0392b;
+        }
+
+        .view-link {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: 1px solid white;
+            color: white;
+            padding: 5px 15px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        /* ======= CUSTOM MODAL CSS ======= */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--overlay);
+            display: none; /* Hidden by default */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 400px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            transform: scale(0.9);
+            transition: transform 0.2s ease;
+        }
+
+        .modal-overlay.active { display: flex; }
+        .modal-overlay.active .modal-content { transform: scale(1); }
+
+        .modal-icon {
+            font-size: 50px;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .btn-cancel {
+            background: #bdc3c7;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-confirm {
+            background: var(--primary-red);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h2>SheWalk Admin Console</h2>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+</div>
+
+<div class="container">
+    <div class="card">
+        <h3>🚨 Active Emergency Tracking</h3>
+        <table id="activeTable">
+            <thead>
+            <tr>
+                <th>User</th>
+                <th>Start Time</th>
+                <th>Map Link</th>
+                <th>Command</th>
+            </tr>
+            </thead>
+            <tbody id="activeSessionsList">
+            <tr><td colspan="4" style="text-align:center;">Loading active sessions...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <h3>👥 Registered Users</h3>
+        <table>
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Trusted Contact</th>
+            </tr>
+            </thead>
+            <tbody id="userList">
+            <tr><td colspan="4" style="text-align:center;">Loading users...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <h3>📜 Emergency History</h3>
+        <table>
+            <thead>
+            <tr>
+                <th>User</th>
+                <th>Started At</th>
+                <th>Ended At</th>
+                <th>Status</th>
+                <th>Duration</th>
+            </tr>
+            </thead>
+            <tbody id="historyList">
+            <tr><td colspan="5" style="text-align:center;">Loading history...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="stopModal" class="modal-overlay">
+    <div class="modal-content">
+        <span class="modal-icon">⚠️</span>
+        <h3>Confirm Action</h3>
+        <p>Are you sure you want to <strong>Force Stop</strong> this emergency session? This will end tracking for the user.</p>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+            <button class="btn-confirm" id="confirmStopBtn">Yes, Stop it</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/admin.js"></script>
+
+<script>
+    function logout() {
+        sessionStorage.removeItem("token");
+        window.location.href = "login.html";
+    }
+</script>
+
+</body>
+</html>
