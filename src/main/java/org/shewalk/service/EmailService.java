@@ -16,15 +16,17 @@ public class EmailService {
 
     public void sendTrackingLink(String toEmail, String link) {
 
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(toEmail);
-        message.setSubject("Emergency Alert - SheWalk");
-        message.setText(
-                "Emergency Alert!\n\n" +
-                        "Live tracking:\n" +
-                        link
-        );
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(toEmail);
+            message.setSubject("Emergency Alert - SheWalk");
+            message.setText("Live tracking:\n" + link);
 
-        mailSender.send(message);
+            mailSender.send(message);
+            System.out.println("EMAIL SENT SUCCESSFULLY");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
