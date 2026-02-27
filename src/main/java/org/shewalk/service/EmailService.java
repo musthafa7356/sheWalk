@@ -28,6 +28,7 @@ public class EmailService {
 
             mailSender.send(message);
             System.out.println("EMAIL SENT SUCCESSFULLY");
+            System.out.println("AFTER SEND");
 
         } catch (Exception e) {
             e.printStackTrace();
