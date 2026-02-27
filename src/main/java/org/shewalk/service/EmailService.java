@@ -17,6 +17,10 @@ public class EmailService {
     public void sendTrackingLink(String toEmail, String link) {
 
         try {
+
+            System.out.println("Trusted email: " + toEmail);
+            System.out.println("Tracking link: " + link);
+
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo(toEmail);
             message.setSubject("Emergency Alert - SheWalk");
