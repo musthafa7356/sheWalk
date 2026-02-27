@@ -31,6 +31,7 @@ public class EmailService {
             System.out.println("AFTER SEND");
 
         } catch (Exception e) {
+            System.err.println("!!! EMAIL ERROR !!!: " + e.getMessage());
             e.printStackTrace();
         }
     }
