@@ -1,39 +1,61 @@
 package org.shewalk.service;
 
-
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
+import sendinblue.ApiClient;
+import sendinblue.Configuration;
+import sendinblue.auth.ApiKeyAuth;
+import sibModel.*;
+import sibApi.TransactionalEmailsApi;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import java.util.Collections;
 
 @Service
 public class EmailService {
 
-    private final JavaMailSender mailSender;
+    @Value("${BREVO_API_KEY}")
+    private String apiKey;
 
-    public EmailService(JavaMailSender mailSender) {
-        this.mailSender = mailSender;
-    }
+    @Value("${SENDER_EMAIL}")
+    private String senderEmail;
 
     @Async
     public void sendTrackingLink(String toEmail, String link) {
-
         try {
+            System.out.println("Attempting to send API email to: " + toEmail);
 
-            System.out.println("Trusted email: " + toEmail);
-            System.out.println("Tracking link: " + link);
+            // Configure API Client
+            ApiClient defaultClient = Configuration.getDefaultApiClient();
+            ApiKeyAuth apiKeyAuth = (ApiKeyAuth) defaultClient.getAuthentication("api-key");
+            apiKeyAuth.setApiKey(apiKey);
 
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setTo(toEmail);
-            message.setSubject("Emergency Alert - SheWalk");
-            message.setText("Live tracking:\n" + link);
 
-            mailSender.send(message);
-            System.out.println("EMAIL SENT SUCCESSFULLY");
-            System.out.println("AFTER SEND");
+            TransactionalEmailsApi apiInstance = new TransactionalEmailsApi();
+
+            // Create the Email Object
+            SendSmtpEmail sendSmtpEmail = new SendSmtpEmail();
+
+            // Sender details (Dynamic from Render Environment)
+            sendSmtpEmail.setSender(new SendSmtpEmailSender().email(senderEmail).name("SheWalk Emergency"));
+
+            // Receiver details
+            sendSmtpEmail.setTo(Collections.singletonList(new SendSmtpEmailTo().email(toEmail)));
+
+            // Subject and Content
+            sendSmtpEmail.setSubject("🚨 Emergency Alert - SheWalk 🚨");
+            sendSmtpEmail.setHtmlContent(
+                    "<h2>Emergency Alert!</h2>" +
+                            "<p>A user has triggered an SOS. You are their trusted contact.</p>" +
+                            "<p><b>Live Tracking Link:</b> <a href='" + link + "'>" + link + "</a></p>" +
+                            "<p>Please check on them immediately.</p>"
+            );
+
+            // Send via HTTP (This works on Render!)
+            apiInstance.sendTransacEmail(sendSmtpEmail);
+            System.out.println("EMAIL SENT VIA API SUCCESSFULLY");
 
         } catch (Exception e) {
-            System.err.println("!!! EMAIL ERROR !!!: " + e.getMessage());
+            System.err.println("!!! BREVO API ERROR !!!: " + e.getMessage());
             e.printStackTrace();
         }
     }
