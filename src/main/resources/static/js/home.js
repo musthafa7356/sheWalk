@@ -38,64 +38,78 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     // --- SOS Start Logic ---
-    document.getElementById("startEmergencyBtn").onclick = () => {
-        if (!navigator.geolocation) {
-            showAlert("Geolocation not supported.");
-            return;
-        }
+    let watchId = null; // 1. Add this variable at the top to store the tracker
 
-        msgEl.innerText = "📍 Getting GPS location...";
+        document.getElementById("startEmergencyBtn").onclick = () => {
+            if (!navigator.geolocation) {
+                showAlert("Geolocation not supported.");
+                return;
+            }
 
-        navigator.geolocation.getCurrentPosition(async (position) => {
-            toggleSOSUI(true);
-            msgEl.innerText = "📡 Activating SOS...";
+            msgEl.innerText = "📍 Getting GPS location...";
+
+            // 2. Change getCurrentPosition to watchPosition
+            watchId = navigator.geolocation.watchPosition(async (position) => {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+
+                toggleSOSUI(true);
+                msgEl.innerText = "📡 Tracking Active. Location shared.";
+
+                try {
+                    // 3. This will now hit your API every time the user moves
+                    const response = await fetch("/api/emergency/start", {
+                        method: "POST",
+                        headers: {
+                            "Authorization": "Bearer " + token,
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            latitude: lat,
+                            longitude: lng
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({}));
+                        console.error("Sync error:", errorData.error);
+                    }
+                } catch (error) {
+                    console.error("Server error during tracking update.");
+                }
+            }, (error) => {
+                showAlert("Location access lost. Please keep GPS enabled.");
+                console.error(error);
+            }, {
+                enableHighAccuracy: true,
+                maximumAge: 0,
+                timeout: 10000
+            });
+        };
+
+        // --- SOS Stop Logic ---
+        document.getElementById("stopEmergencyBtn").onclick = async () => {
+            // 4. IMPORTANT: Stop the GPS watcher when the user clicks 'Stop'
+            if (watchId !== null) {
+                navigator.geolocation.clearWatch(watchId);
+                watchId = null;
+            }
 
             try {
-                const response = await fetch("/api/emergency/start", {
+                const response = await fetch("/api/emergency/stop", {
                     method: "POST",
-                    headers: {
-                        "Authorization": "Bearer " + token,
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        latitude: position.coords.latitude,
-                        longitude: position.coords.longitude
-                    })
+                    headers: { "Authorization": "Bearer " + token }
                 });
-
                 if (response.ok) {
-                    msgEl.innerText = "✅ SOS Active. Location shared.";
-                } else {
-                    const errorData = await response.json().catch(() => ({}));
                     toggleSOSUI(false);
-                    showAlert(errorData.error || "Failed to activate SOS.");
+                    msgEl.innerText = "🟢 You are marked safe.";
+                } else {
+                    showAlert("Failed to stop session.");
                 }
             } catch (error) {
-                toggleSOSUI(false);
                 showAlert("Server error.");
             }
-        }, () => {
-            showAlert("Location access denied. Please enable GPS.");
-        }, { enableHighAccuracy: true, timeout: 5000 });
-    };
-
-    // --- SOS Stop Logic ---
-    document.getElementById("stopEmergencyBtn").onclick = async () => {
-        try {
-            const response = await fetch("/api/emergency/stop", {
-                method: "POST",
-                headers: { "Authorization": "Bearer " + token }
-            });
-            if (response.ok) {
-                toggleSOSUI(false);
-                msgEl.innerText = "🟢 You are marked safe.";
-            } else {
-                showAlert("Failed to stop session.");
-            }
-        } catch (error) {
-            showAlert("Server error.");
-        }
-    };
+        };
 
     // --- Logout Logic ---
     document.getElementById("logoutBtn").onclick = () => {
